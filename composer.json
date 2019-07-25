@@ -1,0 +1,37 @@
+{
+    "name": "jdecool/clubhouse-api",
+    "type": "library",
+    "description": "PHP SDK for Clubhouse",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérémy DECOOL",
+            "email": "contact@jdecool.fr"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "ext-json": "*",
+        "php-http/client-common": "^1.7",
+        "php-http/client-implementation": "^1.0",
+        "php-http/discovery": "^1.4",
+        "php-http/httplug": "^1.1"
+    },
+    "require-dev": {
+        "php-http/guzzle6-adapter": "^1.0",
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "JDecool\\Clubhouse\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JDecool\\Clubhouse\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
