@@ -1,6 +1,10 @@
 Clubhouse API client
 ====================
 
+[![Build Status](https://travis-ci.org/jdecool/clubhouse-api.svg?branch=master)](https://travis-ci.org/jdecool/clubhouse-api?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jdecool/clubhouse-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jdecool/clubhouse-api/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/jdecool/clubhouse-api/v/stable.png)](https://packagist.org/packages/jdecool/clubhouse-api)
+
 A simple PHP client for Clubhouse.io REST API.
 
 ## Install it
