@@ -7,7 +7,8 @@ namespace JDecool\Clubhouse;
 use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Exception\ClubhouseException,
-    Exception\ResourceNotExist
+    Exception\ResourceNotExist,
+    Exception\SchemaMismatch
 };
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -114,6 +115,9 @@ class Client
         $message = $content['message'] ?? 'An error occured.';
 
         switch ($response->getStatusCode()) {
+            case 400:
+                return new SchemaMismatch($message);
+
             case 404:
                 return new ResourceNotExist($message);
         }

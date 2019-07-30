@@ -9,7 +9,8 @@ use JDecool\Clubhouse\{
     Client,
     ClubhouseException as LegacyClubhouseException,
     Exception\ClubhouseException,
-    Exception\ResourceNotExist
+    Exception\ResourceNotExist,
+    Exception\SchemaMismatch
 };
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -365,6 +366,11 @@ class ClientTest extends TestCase
             ['post', 404, ResourceNotExist::class, []],
             ['put', 404, ResourceNotExist::class, []],
             ['delete', 404, ResourceNotExist::class],
+
+            ['get', 400, SchemaMismatch::class],
+            ['post', 400, SchemaMismatch::class, []],
+            ['put', 400, SchemaMismatch::class, []],
+            ['delete', 400, SchemaMismatch::class],
         ];
     }
 }
