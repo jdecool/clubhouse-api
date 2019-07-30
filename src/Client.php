@@ -8,7 +8,8 @@ use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
-    Exception\SchemaMismatch
+    Exception\SchemaMismatch,
+    Exception\TooManyRequest
 };
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -120,6 +121,9 @@ class Client
 
             case 404:
                 return new ResourceNotExist($message);
+
+            case 429:
+                return new TooManyRequest($message);
         }
 
         return new ClubhouseException($message);

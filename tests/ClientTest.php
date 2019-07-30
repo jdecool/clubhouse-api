@@ -10,7 +10,8 @@ use JDecool\Clubhouse\{
     ClubhouseException as LegacyClubhouseException,
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
-    Exception\SchemaMismatch
+    Exception\SchemaMismatch,
+    Exception\TooManyRequest
 };
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -371,6 +372,11 @@ class ClientTest extends TestCase
             ['post', 400, SchemaMismatch::class, []],
             ['put', 400, SchemaMismatch::class, []],
             ['delete', 400, SchemaMismatch::class],
+
+            ['get', 429, TooManyRequest::class],
+            ['post', 429, TooManyRequest::class, []],
+            ['put', 429, TooManyRequest::class, []],
+            ['delete', 429, TooManyRequest::class],
         ];
     }
 }
