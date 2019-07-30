@@ -17,6 +17,7 @@ class ClientBuilder
 {
     public const V1 = 'v1';
     public const V2 = 'v2';
+    public const BETA = 'beta';
 
     private $httpClient;
     private $messageFactory;
@@ -37,6 +38,11 @@ class ClientBuilder
         return $this->create(self::V2, $token);
     }
 
+    public function createClientBeta(string $token): Client
+    {
+        return $this->create(self::BETA, $token);
+    }
+
     public function create(string $version, string $token): Client
     {
         $http = new HttpMethodsClient($this->httpClient, $this->messageFactory);
@@ -47,6 +53,9 @@ class ClientBuilder
 
             case self::V2:
                 return Client::createV2($http, $token);
+
+            case self::BETA:
+                return Client::createBeta($http, $token);
         }
 
         throw new RuntimeException("Version '$version' is not supported.");
