@@ -8,7 +8,8 @@ use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Client,
     ClubhouseException as LegacyClubhouseException,
-    Exception\ClubhouseException
+    Exception\ClubhouseException,
+    Exception\ResourceNotExist
 };
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -332,5 +333,38 @@ class ClientTest extends TestCase
         $this->expectExceptionMessage('An error occured.');
 
         $client->delete('resource/42', []);
+    }
+
+    /**
+     * @dataProvider exceptionCalls
+     */
+    public function testCallsThrowAnException(string $method, int $statusCode, string $exceptionClass, ...$params): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn(json_encode([]));
+
+        $http = $this->createMock(HttpMethodsClient::class);
+        $http->expects($this->once())
+            ->method($method)
+            ->willReturn($response);
+
+        $client = new Client($http, 'http://domain.tld', 'foo');
+
+        $this->expectException($exceptionClass);
+
+        call_user_func([$client, $method], 'resource', $params);
+    }
+
+    public function exceptionCalls(): array
+    {
+        return [
+            ['get', 404, ResourceNotExist::class],
+            ['post', 404, ResourceNotExist::class, []],
+            ['put', 404, ResourceNotExist::class, []],
+            ['delete', 404, ResourceNotExist::class],
+        ];
     }
 }

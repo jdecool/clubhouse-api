@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace JDecool\Clubhouse;
 
 use Http\Client\Common\HttpMethodsClient;
-use JDecool\Clubhouse\Exception\ClubhouseException;
+use JDecool\Clubhouse\{
+    Exception\ClubhouseException,
+    Exception\ResourceNotExist
+};
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -109,6 +112,11 @@ class Client
     {
         $content = json_decode((string) $response->getBody(), true);
         $message = $content['message'] ?? 'An error occured.';
+
+        switch ($response->getStatusCode()) {
+            case 404:
+                return new ResourceNotExist($message);
+        }
 
         return new ClubhouseException($message);
     }
