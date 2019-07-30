@@ -11,7 +11,8 @@ use JDecool\Clubhouse\{
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
-    Exception\TooManyRequest
+    Exception\TooManyRequest,
+    Exception\Unprocessable
 };
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -377,6 +378,11 @@ class ClientTest extends TestCase
             ['post', 429, TooManyRequest::class, []],
             ['put', 429, TooManyRequest::class, []],
             ['delete', 429, TooManyRequest::class],
+
+            ['get', 422, Unprocessable::class],
+            ['post', 422, Unprocessable::class, []],
+            ['put', 422, Unprocessable::class, []],
+            ['delete', 422, Unprocessable::class],
         ];
     }
 }

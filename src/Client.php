@@ -9,7 +9,8 @@ use JDecool\Clubhouse\{
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
-    Exception\TooManyRequest
+    Exception\TooManyRequest,
+    Exception\Unprocessable
 };
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -121,6 +122,9 @@ class Client
 
             case 404:
                 return new ResourceNotExist($message);
+
+            case 422:
+                return new Unprocessable($message);
 
             case 429:
                 return new TooManyRequest($message);
