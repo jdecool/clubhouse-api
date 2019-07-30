@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JDecool\Clubhouse;
 
 use Http\Client\Common\HttpMethodsClient;
+use JDecool\Clubhouse\Exception\ClubhouseException;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -107,7 +108,8 @@ class Client
     private function createExceptionFromResponse(ResponseInterface $response): ClubhouseException
     {
         $content = json_decode((string) $response->getBody(), true);
+        $message = $content['message'] ?? 'An error occured.';
 
-        return new ClubhouseException($content['message'] ?? 'An error occured.');
+        return new ClubhouseException($message);
     }
 }

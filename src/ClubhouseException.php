@@ -6,6 +6,9 @@ namespace JDecool\Clubhouse;
 
 use RuntimeException;
 
+/**
+ * @deprecated
+ */
 class ClubhouseException extends RuntimeException
 {
 }

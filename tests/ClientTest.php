@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace JDecool\Clubhouse\Tests;
 
 use Http\Client\Common\HttpMethodsClient;
-use JDecool\Clubhouse\Client;
-use JDecool\Clubhouse\ClubhouseException;
+use JDecool\Clubhouse\{
+    Client,
+    ClubhouseException as LegacyClubhouseException,
+    Exception\ClubhouseException
+};
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -92,6 +95,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->get('resource/42');
@@ -114,6 +118,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->get('resource/42');
@@ -164,6 +169,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->post('resource', []);
@@ -185,6 +191,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->post('resource', []);
@@ -235,6 +242,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->put('resource/42', []);
@@ -256,6 +264,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->put('resource/42', []);
@@ -297,6 +306,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->delete('resource/42', []);
@@ -318,6 +328,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->delete('resource/42', []);
