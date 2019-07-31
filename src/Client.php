@@ -19,6 +19,7 @@ class Client
 {
     private const ENDPOINT_V1 = 'https://api.clubhouse.io/api/v1';
     private const ENDPOINT_V2 = 'https://api.clubhouse.io/api/v2';
+    private const ENDPOINT_BETA = 'https://api.clubhouse.io/api/beta';
 
     private $http;
     private $baseUri;
@@ -32,6 +33,11 @@ class Client
     public static function createV2(HttpMethodsClient $http, string $token): self
     {
         return new self($http, self::ENDPOINT_V2, $token);
+    }
+
+    public static function createBeta(HttpMethodsClient $http, string $token): self
+    {
+        return new self($http, self::ENDPOINT_BETA, $token);
     }
 
     public function __construct(HttpMethodsClient $http, string $baseUri, string $token)

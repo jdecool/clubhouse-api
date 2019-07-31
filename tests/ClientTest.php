@@ -40,6 +40,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testCreateBeta(): void
+    {
+        $client = Client::createBeta(
+            $this->createMock(HttpMethodsClient::class),
+            'foo'
+        );
+
+        $this->assertInstanceOf(Client::class, $client);
+    }
+
     public function testContruct(): void
     {
         $client = new Client(
@@ -60,6 +70,75 @@ class ClientTest extends TestCase
             'foo',
             'bar'
         );
+    }
+
+    /**
+     * @dataProvider httpMethods
+     */
+    public function testCallForV1(string $method, int $statusCode, ...$params): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn(json_encode([]));
+
+        $http = $this->createMock(HttpMethodsClient::class);
+        $http->expects($this->once())
+            ->method($method)
+            ->with('https://api.clubhouse.io/api/v1/resource?token=foo')
+            ->willReturn($response);
+
+        $client = Client::createV1($http, 'foo');
+        $resource = call_user_func([$client, $method], 'resource', $params);
+
+        $this->assertIsArray($resource);
+    }
+
+    /**
+     * @dataProvider httpMethods
+     */
+    public function testCallForV2(string $method, int $statusCode, ...$params): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn(json_encode([]));
+
+        $http = $this->createMock(HttpMethodsClient::class);
+        $http->expects($this->once())
+            ->method($method)
+            ->with('https://api.clubhouse.io/api/v2/resource?token=foo')
+            ->willReturn($response);
+
+        $client = Client::createV2($http, 'foo');
+        $resource = call_user_func([$client, $method], 'resource', $params);
+
+        $this->assertIsArray($resource);
+    }
+
+    /**
+     * @dataProvider httpMethods
+     */
+    public function testCallForBeta(string $method, int $statusCode, ...$params): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn(json_encode([]));
+
+        $http = $this->createMock(HttpMethodsClient::class);
+        $http->expects($this->once())
+            ->method($method)
+            ->with('https://api.clubhouse.io/api/beta/resource?token=foo')
+            ->willReturn($response);
+
+        $client = Client::createBeta($http, 'foo');
+        $resource = call_user_func([$client, $method], 'resource', $params);
+
+        $this->assertIsArray($resource);
     }
 
     public function testGetCall(): void
@@ -383,6 +462,16 @@ class ClientTest extends TestCase
             ['post', 422, Unprocessable::class, []],
             ['put', 422, Unprocessable::class, []],
             ['delete', 422, Unprocessable::class],
+        ];
+    }
+
+    public function httpMethods(): array
+    {
+        return [
+            ['get', 200],
+            ['post', 201, []],
+            ['put', 200, []],
+            ['delete', 204],
         ];
     }
 }
