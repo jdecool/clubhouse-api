@@ -5,6 +5,13 @@ declare(strict_types=1);
 namespace JDecool\Clubhouse;
 
 use Http\Client\Common\HttpMethodsClient;
+use JDecool\Clubhouse\{
+    Exception\ClubhouseException,
+    Exception\ResourceNotExist,
+    Exception\SchemaMismatch,
+    Exception\TooManyRequest,
+    Exception\Unprocessable
+};
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -113,7 +120,22 @@ class Client
     private function createExceptionFromResponse(ResponseInterface $response): ClubhouseException
     {
         $content = json_decode((string) $response->getBody(), true);
+        $message = $content['message'] ?? 'An error occured.';
 
-        return new ClubhouseException($content['message'] ?? 'An error occured.');
+        switch ($response->getStatusCode()) {
+            case 400:
+                return new SchemaMismatch($message);
+
+            case 404:
+                return new ResourceNotExist($message);
+
+            case 422:
+                return new Unprocessable($message);
+
+            case 429:
+                return new TooManyRequest($message);
+        }
+
+        return new ClubhouseException($message);
     }
 }

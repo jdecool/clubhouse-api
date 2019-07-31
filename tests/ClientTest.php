@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace JDecool\Clubhouse\Tests;
 
 use Http\Client\Common\HttpMethodsClient;
-use JDecool\Clubhouse\Client;
-use JDecool\Clubhouse\ClubhouseException;
+use JDecool\Clubhouse\{
+    Client,
+    ClubhouseException as LegacyClubhouseException,
+    Exception\ClubhouseException,
+    Exception\ResourceNotExist,
+    Exception\SchemaMismatch,
+    Exception\TooManyRequest,
+    Exception\Unprocessable
+};
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -171,6 +178,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->get('resource/42');
@@ -193,6 +201,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->get('resource/42');
@@ -243,6 +252,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->post('resource', []);
@@ -264,6 +274,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->post('resource', []);
@@ -314,6 +325,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->put('resource/42', []);
@@ -335,6 +347,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->put('resource/42', []);
@@ -376,6 +389,7 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('Bad request');
 
         $client->delete('resource/42', []);
@@ -397,9 +411,58 @@ class ClientTest extends TestCase
         $client = new Client($http, 'http://domain.tld', 'foo');
 
         $this->expectException(ClubhouseException::class);
+        $this->expectException(LegacyClubhouseException::class);
         $this->expectExceptionMessage('An error occured.');
 
         $client->delete('resource/42', []);
+    }
+
+    /**
+     * @dataProvider exceptionCalls
+     */
+    public function testCallsThrowAnException(string $method, int $statusCode, string $exceptionClass, ...$params): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn(json_encode([]));
+
+        $http = $this->createMock(HttpMethodsClient::class);
+        $http->expects($this->once())
+            ->method($method)
+            ->willReturn($response);
+
+        $client = new Client($http, 'http://domain.tld', 'foo');
+
+        $this->expectException($exceptionClass);
+
+        call_user_func([$client, $method], 'resource', $params);
+    }
+
+    public function exceptionCalls(): array
+    {
+        return [
+            ['get', 404, ResourceNotExist::class],
+            ['post', 404, ResourceNotExist::class, []],
+            ['put', 404, ResourceNotExist::class, []],
+            ['delete', 404, ResourceNotExist::class],
+
+            ['get', 400, SchemaMismatch::class],
+            ['post', 400, SchemaMismatch::class, []],
+            ['put', 400, SchemaMismatch::class, []],
+            ['delete', 400, SchemaMismatch::class],
+
+            ['get', 429, TooManyRequest::class],
+            ['post', 429, TooManyRequest::class, []],
+            ['put', 429, TooManyRequest::class, []],
+            ['delete', 429, TooManyRequest::class],
+
+            ['get', 422, Unprocessable::class],
+            ['post', 422, Unprocessable::class, []],
+            ['put', 422, Unprocessable::class, []],
+            ['delete', 422, Unprocessable::class],
+        ];
     }
 
     public function httpMethods(): array
