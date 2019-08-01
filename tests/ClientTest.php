@@ -267,7 +267,7 @@ class ClientTest extends TestCase
         $response->method('getStatusCode')
             ->willReturn(204);
         $response->method('getBody')
-            ->willReturn(json_encode([]));
+            ->willReturn(json_encode(null));
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -276,9 +276,7 @@ class ClientTest extends TestCase
             ->willReturn($response);
 
         $client = new Client($http, 'http://domain.tld', 'foo');
-        $resource = $client->delete('resource');
-
-        $this->assertIsArray($resource);
+        $this->assertNull($client->delete('resource'));
     }
 
     public function testDeleteCallWithError(): void
