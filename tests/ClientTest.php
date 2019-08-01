@@ -75,13 +75,13 @@ class ClientTest extends TestCase
     /**
      * @dataProvider httpMethods
      */
-    public function testCallForV1(string $method, int $statusCode, ...$params): void
+    public function testCallForV1(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')
             ->willReturn($statusCode);
         $response->method('getBody')
-            ->willReturn(json_encode([]));
+            ->willReturn(json_encode($responseContent));
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -90,21 +90,21 @@ class ClientTest extends TestCase
             ->willReturn($response);
 
         $client = Client::createV1($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $params);
+        $resource = call_user_func([$client, $method], 'resource', $requestParams);
 
-        $this->assertIsArray($resource);
+        $this->assertTrue(true, 'No error occured during call');
     }
 
     /**
      * @dataProvider httpMethods
      */
-    public function testCallForV2(string $method, int $statusCode, ...$params): void
+    public function testCallForV2(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')
             ->willReturn($statusCode);
         $response->method('getBody')
-            ->willReturn(json_encode([]));
+            ->willReturn(json_encode($responseContent));
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -113,21 +113,21 @@ class ClientTest extends TestCase
             ->willReturn($response);
 
         $client = Client::createV2($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $params);
+        $resource = call_user_func([$client, $method], 'resource', $requestParams);
 
-        $this->assertIsArray($resource);
+        $this->assertTrue(true, 'No error occured during call');
     }
 
     /**
      * @dataProvider httpMethods
      */
-    public function testCallForBeta(string $method, int $statusCode, ...$params): void
+    public function testCallForBeta(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')
             ->willReturn($statusCode);
         $response->method('getBody')
-            ->willReturn(json_encode([]));
+            ->willReturn(json_encode($responseContent));
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -136,9 +136,9 @@ class ClientTest extends TestCase
             ->willReturn($response);
 
         $client = Client::createBeta($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $params);
+        $resource = call_user_func([$client, $method], 'resource', $requestParams);
 
-        $this->assertIsArray($resource);
+        $this->assertTrue(true, 'No error occured during call');
     }
 
     public function testGetCall(): void
@@ -466,10 +466,10 @@ class ClientTest extends TestCase
     public function httpMethods(): array
     {
         return [
-            ['get', 200],
-            ['post', 201, []],
-            ['put', 200, []],
-            ['delete', 204],
+            ['get', 200, []],
+            ['post', 201, [], []],
+            ['put', 200, [], []],
+            ['delete', 204, null],
         ];
     }
 }
