@@ -81,7 +81,7 @@ class Client
         return json_decode((string) $response->getBody(), true);
     }
 
-    public function delete(string $uri): array
+    public function delete(string $uri): void
     {
         $response = $this->http->delete(
             $this->endpoint($uri)
@@ -90,8 +90,6 @@ class Client
         if (204 !== $response->getStatusCode()) {
             throw $this->createExceptionFromResponse($response);
         }
-
-        return json_decode((string) $response->getBody(), true);
     }
 
     private function endpoint(string $uri): string
