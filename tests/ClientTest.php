@@ -15,8 +15,10 @@ use JDecool\Clubhouse\{
     Exception\Unprocessable
 };
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{
+    ResponseInterface,
+    StreamInterface
+};
 use RuntimeException;
 
 class ClientTest extends TestCase
