@@ -48,7 +48,7 @@ class Client
             throw $this->createExceptionFromResponse($response);
         }
 
-        return json_decode((string) $response->getBody(), true);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     public function post(string $uri, array $data): array
@@ -63,7 +63,7 @@ class Client
             throw $this->createExceptionFromResponse($response);
         }
 
-        return json_decode((string) $response->getBody(), true);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     public function put(string $uri, array $data): array
@@ -78,7 +78,7 @@ class Client
             throw $this->createExceptionFromResponse($response);
         }
 
-        return json_decode((string) $response->getBody(), true);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     public function delete(string $uri): void
@@ -104,7 +104,7 @@ class Client
 
     private function createExceptionFromResponse(ResponseInterface $response): ClubhouseException
     {
-        $content = json_decode((string) $response->getBody(), true);
+        $content = json_decode($response->getBody()->getContents(), true);
 
         return new ClubhouseException($content['message'] ?? 'An error occured.');
     }

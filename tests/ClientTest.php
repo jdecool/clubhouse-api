@@ -9,6 +9,7 @@ use JDecool\Clubhouse\Client;
 use JDecool\Clubhouse\ClubhouseException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 class ClientTest extends TestCase
@@ -57,11 +58,7 @@ class ClientTest extends TestCase
 
     public function testGetCall(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(200);
-        $response->method('getBody')
-            ->willReturn(json_encode([]));
+        $response = $this->createResponse(200, []);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -77,11 +74,7 @@ class ClientTest extends TestCase
 
     public function testGetCallWithError(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(400);
-        $response->method('getBody')
-            ->willReturn(json_encode(['message' => 'Bad request']));
+        $response = $this->createResponse(400, ['message' => 'Bad request']);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -99,11 +92,7 @@ class ClientTest extends TestCase
 
     public function testGetCallWithErrorWithDefaultMessage(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(500);
-        $response->method('getBody')
-            ->willReturn('');
+        $response = $this->createResponse(500, '');
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -126,11 +115,7 @@ class ClientTest extends TestCase
             'qux' => 'quux',
         ];
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(201);
-        $response->method('getBody')
-            ->willReturn(json_encode([]));
+        $response = $this->createResponse(201, []);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -150,11 +135,7 @@ class ClientTest extends TestCase
 
     public function testPostCallWithError(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(400);
-        $response->method('getBody')
-            ->willReturn(json_encode(['message' => 'Bad request']));
+        $response = $this->createResponse(400, ['message' => 'Bad request']);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -171,11 +152,7 @@ class ClientTest extends TestCase
 
     public function testPostCallWithErrorWithDefaultMessage(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(500);
-        $response->method('getBody')
-            ->willReturn('');
+        $response = $this->createResponse(500, '');
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -197,11 +174,7 @@ class ClientTest extends TestCase
             'qux' => 'quux',
         ];
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(200);
-        $response->method('getBody')
-            ->willReturn(json_encode([]));
+        $response = $this->createResponse(200, []);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -221,11 +194,7 @@ class ClientTest extends TestCase
 
     public function testPutCallWithError(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(400);
-        $response->method('getBody')
-            ->willReturn(json_encode(['message' => 'Bad request']));
+        $response = $this->createResponse(400, ['message' => 'Bad request']);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -242,11 +211,7 @@ class ClientTest extends TestCase
 
     public function testPutCallWithErrorWithDefaultMessage(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(500);
-        $response->method('getBody')
-            ->willReturn('');
+        $response = $this->createResponse(500, '');
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -263,11 +228,7 @@ class ClientTest extends TestCase
 
     public function testDeleteCall(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(204);
-        $response->method('getBody')
-            ->willReturn(json_encode(null));
+        $response = $this->createResponse(204, null);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -281,11 +242,7 @@ class ClientTest extends TestCase
 
     public function testDeleteCallWithError(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(400);
-        $response->method('getBody')
-            ->willReturn(json_encode(['message' => 'Bad request']));
+        $response = $this->createResponse(400, ['message' => 'Bad request']);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -302,11 +259,7 @@ class ClientTest extends TestCase
 
     public function testDeleteCallWithErrorWithDefaultMessage(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn(500);
-        $response->method('getBody')
-            ->willReturn('');
+        $response = $this->createResponse(500, '');
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -319,5 +272,87 @@ class ClientTest extends TestCase
         $this->expectExceptionMessage('An error occured.');
 
         $client->delete('resource/42', []);
+    }
+
+    private function createResponse(int $statusCode, $content = null): ResponseInterface
+    {
+        $stream = new class($content) implements StreamInterface {
+            private $content;
+
+            public function __construct($content)
+            {
+                $this->content = json_encode($content);
+            }
+
+            public function __toString()
+            {
+                return (string) $this->content;
+            }
+
+            public function close()
+            {
+            }
+
+            public function detach()
+            {
+            }
+
+            public function getSize()
+            {
+            }
+
+            public function tell()
+            {
+            }
+
+            public function eof()
+            {
+            }
+
+            public function isSeekable()
+            {
+            }
+
+            public function seek($offset, $whence = SEEK_SET)
+            {
+            }
+
+            public function rewind()
+            {
+            }
+
+            public function isWritable()
+            {
+            }
+
+            public function write($string)
+            {
+            }
+
+            public function isReadable()
+            {
+            }
+
+            public function read($length)
+            {
+            }
+
+            public function getContents()
+            {
+                return $this->content;
+            }
+
+            public function getMetadata($key = null)
+            {
+            }
+        };
+
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->method('getBody')
+            ->willReturn($stream);
+
+        return $response;
     }
 }
