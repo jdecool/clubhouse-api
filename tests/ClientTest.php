@@ -78,11 +78,7 @@ class ClientTest extends TestCase
      */
     public function testCallForV1(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getBody')
-            ->willReturn(json_encode($responseContent));
+        $response = $this->createResponse($statusCode, $responseContent);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -101,11 +97,7 @@ class ClientTest extends TestCase
      */
     public function testCallForV2(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getBody')
-            ->willReturn(json_encode($responseContent));
+        $response = $this->createResponse($statusCode, $responseContent);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -124,11 +116,7 @@ class ClientTest extends TestCase
      */
     public function testCallForBeta(string $method, int $statusCode, $responseContent, ...$requestParams): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getBody')
-            ->willReturn(json_encode($responseContent));
+        $response = $this->createResponse($statusCode, $responseContent);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
@@ -373,11 +361,7 @@ class ClientTest extends TestCase
      */
     public function testCallsThrowAnException(string $method, int $statusCode, string $exceptionClass, ...$params): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getBody')
-            ->willReturn(json_encode([]));
+        $response = $this->createResponse($statusCode, []);
 
         $http = $this->createMock(HttpMethodsClient::class);
         $http->expects($this->once())
