@@ -15,7 +15,8 @@
         "php-http/client-common": "^1.7",
         "php-http/client-implementation": "^1.0",
         "php-http/discovery": "^1.4",
-        "php-http/httplug": "^1.1"
+        "php-http/httplug": "^1.1",
+        "phpstan/phpstan": "^0.11.12"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",

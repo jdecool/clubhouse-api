@@ -22,6 +22,7 @@ install:
 
 script:
     - vendor/bin/phpunit --coverage-clover=coverage.clover
+    - vendor/bin/phpstan analyse src -c phpstan.neon -l max
 
 after_script:
     - if [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi
