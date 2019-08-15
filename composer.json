@@ -15,12 +15,12 @@
         "php-http/client-common": "^1.7",
         "php-http/client-implementation": "^1.0",
         "php-http/discovery": "^1.4",
-        "php-http/httplug": "^1.1",
-        "phpstan/phpstan": "^0.11.12"
+        "php-http/httplug": "^1.1"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
         "php-http/guzzle6-adapter": "^1.0",
+        "phpstan/phpstan": "^0.11",
         "phpunit/phpunit": "^8.0"
     },
     "autoload": {
