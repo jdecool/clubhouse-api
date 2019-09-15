@@ -31,11 +31,13 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['7.2', '7.3']
     steps:
       - uses: actions/checkout@master
-      - uses: docker://composer
+      - uses: baptouuuu/setup-php@1.0.2
         with:
-          args: install
-      - uses: docker://php:7.3-cli-alpine
-        with:
-          entrypoint: vendor/bin/phpunit
+          version: ${{ matrix.version }}
+      - run: 'composer install'
+      - run: 'vendor/bin/phpunit'
