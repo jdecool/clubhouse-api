@@ -10,7 +10,7 @@ jobs:
       - uses: docker://composer
         with:
           args: install
-      - uses: docker://php:7.3-cli-alpine
+      - uses: docker://php:7.4-cli-alpine
         with:
           entrypoint: vendor/bin/php-cs-fixer
           args: fix -v --dry-run
@@ -23,7 +23,7 @@ jobs:
       - uses: docker://composer
         with:
           args: install
-      - uses: docker://php:7.3-cli-alpine
+      - uses: docker://php:7.4-cli-alpine
         with:
           entrypoint: vendor/bin/phpstan
           args: analyse src -c phpstan.neon -l max
