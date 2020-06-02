@@ -31,9 +31,14 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         version: ['7.2', '7.3', '7.4']
+        experimental: [false]
+        include:
+          - version: '8.0'
+            experimental: true
     steps:
       - uses: actions/checkout@master
       - uses: shivammathur/setup-php@v2
