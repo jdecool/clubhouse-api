@@ -36,8 +36,8 @@ jobs:
         version: ['7.2', '7.3']
     steps:
       - uses: actions/checkout@master
-      - uses: baptouuuu/setup-php@1.0.2
+      - uses: shivammathur/setup-php@v2
         with:
-          version: ${{ matrix.version }}
+          php-version: ${{ matrix.version }}
       - run: 'composer install'
       - run: 'vendor/bin/phpunit'
