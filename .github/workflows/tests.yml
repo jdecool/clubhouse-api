@@ -34,10 +34,11 @@ jobs:
     strategy:
       matrix:
         version: ['7.2', '7.3', '7.4']
+        flags: ['', '--prefer-lowest', '--prefer-stable']
     steps:
       - uses: actions/checkout@master
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.version }}
-      - run: 'composer install'
+      - run: 'composer update --prefer-dist --no-interaction ${{ matrix.flags }}'
       - run: 'vendor/bin/phpunit'
