@@ -52,6 +52,10 @@ class Client
             throw new RuntimeException('Invalid Clubouse base URI.');
         }
 
+        if ('' === trim($token)) {
+            throw new RuntimeException('API token is required.');
+        }
+
         $this->http = $http;
         $this->baseUri = $baseUri;
         $this->token = $token;

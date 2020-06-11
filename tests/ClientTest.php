@@ -33,6 +33,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testAnExceptionThrowWhenCreateV1ClientTokenWithoutApiToken(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        Client::createV1(
+            $this->createMock(HttpMethodsClient::class),
+            ''
+        );
+    }
+
     public function testCreateV2(): void
     {
         $client = Client::createV2(
@@ -41,6 +51,16 @@ class ClientTest extends TestCase
         );
 
         $this->assertInstanceOf(Client::class, $client);
+    }
+
+    public function testAnExceptionThrowWhenCreateV2ClientTokenWithoutApiToken(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        Client::createV2(
+            $this->createMock(HttpMethodsClient::class),
+            ''
+        );
     }
 
     public function testCreateV3(): void
@@ -53,6 +73,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testAnExceptionThrowWhenCreateV3ClientTokenWithoutApiToken(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        Client::createV1(
+            $this->createMock(HttpMethodsClient::class),
+            ''
+        );
+    }
+
     public function testCreateBeta(): void
     {
         $client = Client::createBeta(
@@ -61,6 +91,16 @@ class ClientTest extends TestCase
         );
 
         $this->assertInstanceOf(Client::class, $client);
+    }
+
+    public function testAnExceptionThrowWhenCreateBetaClientTokenWithoutApiToken(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        Client::createBeta(
+            $this->createMock(HttpMethodsClient::class),
+            ''
+        );
     }
 
     public function testContruct(): void
@@ -82,6 +122,17 @@ class ClientTest extends TestCase
             $this->createMock(HttpMethodsClient::class),
             'foo',
             'bar'
+        );
+    }
+
+    public function testAnExceptionThrowWhenCreateTokenWithoutApiToken(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        new Client(
+            $this->createMock(HttpMethodsClient::class),
+            'http://domain.tld',
+            ''
         );
     }
 

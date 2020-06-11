@@ -21,12 +21,30 @@ class ClientBuilderTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testAnExceptionThrowWhenCreateV1ClientTokenWithoutApiToken(): void
+    {
+        $builder = new ClientBuilder();
+
+        $this->expectException(RuntimeException::class);
+
+        $builder->createClientV1('');
+    }
+
     public function testCreateClientV2(): void
     {
         $builder = new ClientBuilder();
         $client = $builder->createClientV2('foo');
 
         $this->assertInstanceOf(Client::class, $client);
+    }
+
+    public function testAnExceptionThrowWhenCreateV2ClientTokenWithoutApiToken(): void
+    {
+        $builder = new ClientBuilder();
+
+        $this->expectException(RuntimeException::class);
+
+        $builder->createClientV2('');
     }
 
     public function testCreateClientV3(): void
@@ -37,12 +55,30 @@ class ClientBuilderTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testAnExceptionThrowWhenCreateV3ClientTokenWithoutApiToken(): void
+    {
+        $builder = new ClientBuilder();
+
+        $this->expectException(RuntimeException::class);
+
+        $builder->createClientV3('');
+    }
+
     public function testCreateClientBeta(): void
     {
         $builder = new ClientBuilder();
         $client = $builder->createClientBeta('foo');
 
         $this->assertInstanceOf(Client::class, $client);
+    }
+
+    public function testAnExceptionThrowWhenCreateBetaClientTokenWithoutApiToken(): void
+    {
+        $builder = new ClientBuilder();
+
+        $this->expectException(RuntimeException::class);
+
+        $builder->createClientBeta('');
     }
 
     /**
@@ -63,6 +99,15 @@ class ClientBuilderTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $builder->create('foo', 'bar');
+    }
+
+    public function testAnExceptionThrowWhenCreateClientTokenWithoutApiToken(): void
+    {
+        $builder = new ClientBuilder();
+
+        $this->expectException(RuntimeException::class);
+
+        $builder->create(ClientBuilder::V3, '');
     }
 
     public function versions(): array
