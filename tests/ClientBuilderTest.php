@@ -29,6 +29,14 @@ class ClientBuilderTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testCreateClientV3(): void
+    {
+        $builder = new ClientBuilder();
+        $client = $builder->createClientV3('foo');
+
+        $this->assertInstanceOf(Client::class, $client);
+    }
+
     public function testCreateClientBeta(): void
     {
         $builder = new ClientBuilder();
@@ -62,6 +70,7 @@ class ClientBuilderTest extends TestCase
         return [
             [ClientBuilder::V1],
             [ClientBuilder::V2],
+            [ClientBuilder::V3],
             [ClientBuilder::BETA],
         ];
     }

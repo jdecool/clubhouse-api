@@ -43,6 +43,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf(Client::class, $client);
     }
 
+    public function testCreateV3(): void
+    {
+        $client = Client::createV3(
+            $this->createMock(HttpMethodsClient::class),
+            'foo'
+        );
+
+        $this->assertInstanceOf(Client::class, $client);
+    }
+
     public function testCreateBeta(): void
     {
         $client = Client::createBeta(

@@ -17,6 +17,7 @@ class ClientBuilder
 {
     public const V1 = 'v1';
     public const V2 = 'v2';
+    public const V3 = 'v3';
     public const BETA = 'beta';
 
     private $httpClient;
@@ -38,6 +39,11 @@ class ClientBuilder
         return $this->create(self::V2, $token);
     }
 
+    public function createClientV3(string $token): Client
+    {
+        return $this->create(self::V3, $token);
+    }
+
     public function createClientBeta(string $token): Client
     {
         return $this->create(self::BETA, $token);
@@ -53,6 +59,9 @@ class ClientBuilder
 
             case self::V2:
                 return Client::createV2($http, $token);
+
+            case self::V3:
+                return Client::createV3($http, $token);
 
             case self::BETA:
                 return Client::createBeta($http, $token);
