@@ -76,6 +76,7 @@ class Client
 
     public function post(string $uri, array $data): array
     {
+        // @phpstan-ignore-next-line
         $response = $this->http->post(
             $this->endpoint($uri),
             ['Content-Type' => 'application/json'],
@@ -91,6 +92,7 @@ class Client
 
     public function put(string $uri, array $data): array
     {
+        // @phpstan-ignore-next-line
         $response = $this->http->put(
             $this->endpoint($uri),
             ['Content-Type' => 'application/json'],

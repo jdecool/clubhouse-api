@@ -1,2 +1,5 @@
 parameters:
-    bootstrap: %rootDir%/../../../vendor/autoload.php
+    bootstrapFiles:
+        - %rootDir%/../../../vendor/autoload.php
+    checkMissingIterableValueType: false
+    inferPrivatePropertyTypeFromConstructor: true
