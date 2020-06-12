@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ['7.2', '7.3', '7.4']
+        version: ['7.3', '7.4']
         flags: ['', '--prefer-lowest', '--prefer-stable']
     steps:
       - uses: actions/checkout@master
