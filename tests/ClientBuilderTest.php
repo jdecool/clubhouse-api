@@ -10,14 +10,14 @@ use JDecool\Clubhouse\{
 };
 use RuntimeException;
 
-test('create v1 client api', function(): void {
+test('create v1 api client', function(): void {
     $builder = new ClientBuilder();
     $client = $builder->createClientV1('foo');
 
     $this->assertInstanceOf(Client::class, $client);
 });
 
-test('an exception throw when create v1 client api without token', function(): void {
+test('an exception throw when create v1 api client without token', function(): void {
     $builder = new ClientBuilder();
 
     $this->expectException(RuntimeException::class);
@@ -25,14 +25,14 @@ test('an exception throw when create v1 client api without token', function(): v
     $builder->createClientV1('');
 });
 
-test('create v2 client api', function(): void {
+test('create v2 api client', function(): void {
     $builder = new ClientBuilder();
     $client = $builder->createClientV2('foo');
 
     $this->assertInstanceOf(Client::class, $client);
 });
 
-test('an exception throw when create v2 client api without token', function(): void {
+test('an exception throw when create v2 api client without token', function(): void {
     $builder = new ClientBuilder();
 
     $this->expectException(RuntimeException::class);
@@ -40,14 +40,14 @@ test('an exception throw when create v2 client api without token', function(): v
     $builder->createClientV2('');
 });
 
-test('create v3 client api', function(): void {
+test('create v3 api client', function(): void {
     $builder = new ClientBuilder();
     $client = $builder->createClientV3('foo');
 
     $this->assertInstanceOf(Client::class, $client);
 });
 
-test('an exception throw when create v3 client api without token', function(): void {
+test('an exception throw when create v3 api client without token', function(): void {
     $builder = new ClientBuilder();
 
     $this->expectException(RuntimeException::class);
@@ -55,14 +55,14 @@ test('an exception throw when create v3 client api without token', function(): v
     $builder->createClientV3('');
 });
 
-test('create beta client api', function(): void {
+test('create beta api client', function(): void {
     $builder = new ClientBuilder();
     $client = $builder->createClientBeta('foo');
 
     $this->assertInstanceOf(Client::class, $client);
 });
 
-test('an exception throw when create beta client api without token', function(): void {
+test('an exception throw when create beta api client without token', function(): void {
     $builder = new ClientBuilder();
 
     $this->expectException(RuntimeException::class);
