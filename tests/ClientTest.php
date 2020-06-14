@@ -12,11 +12,12 @@ use JDecool\Clubhouse\{
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
     Exception\TooManyRequest,
-    Exception\Unprocessable
+    Exception\Unprocessable,
+    HttpClient,
 };
 use Psr\Http\Message\{
     ResponseInterface,
-    StreamInterface
+    StreamInterface,
 };
 use RuntimeException;
 
@@ -26,6 +27,7 @@ test('create v1 api client', function(): void {
         'foo',
     );
 
+    $this->assertInstanceOf(HttpClient::class, $client);
     $this->assertInstanceOf(Client::class, $client);
 });
 
@@ -44,6 +46,7 @@ test('create v2 api client', function(): void {
         'foo',
     );
 
+    $this->assertInstanceOf(HttpClient::class, $client);
     $this->assertInstanceOf(Client::class, $client);
 });
 
@@ -62,6 +65,7 @@ test('create v3 api client', function(): void {
         'foo',
     );
 
+    $this->assertInstanceOf(HttpClient::class, $client);
     $this->assertInstanceOf(Client::class, $client);
 });
 
@@ -80,6 +84,7 @@ test('create beta api client', function(): void {
         'foo',
     );
 
+    $this->assertInstanceOf(HttpClient::class, $client);
     $this->assertInstanceOf(Client::class, $client);
 });
 
@@ -99,6 +104,7 @@ test('create client through constructor', function(): void {
         'foo',
     );
 
+    $this->assertInstanceOf(HttpClient::class, $client);
     $this->assertInstanceOf(Client::class, $client);
 });
 
