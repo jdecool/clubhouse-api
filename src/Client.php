@@ -10,12 +10,12 @@ use JDecool\Clubhouse\{
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
     Exception\TooManyRequest,
-    Exception\Unprocessable
+    Exception\Unprocessable,
 };
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
-class Client
+class Client implements HttpClient
 {
     private const ENDPOINT_V1 = 'https://api.clubhouse.io/api/v1';
     private const ENDPOINT_V2 = 'https://api.clubhouse.io/api/v2';

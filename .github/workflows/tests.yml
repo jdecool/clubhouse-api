@@ -41,4 +41,4 @@ jobs:
         with:
           php-version: ${{ matrix.version }}
       - run: 'composer update --prefer-dist --no-interaction ${{ matrix.flags }}'
-      - run: 'vendor/bin/phpunit'
+      - run: 'vendor/bin/pest'

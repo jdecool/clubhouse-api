@@ -12,546 +12,553 @@ use JDecool\Clubhouse\{
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
     Exception\TooManyRequest,
-    Exception\Unprocessable
+    Exception\Unprocessable,
+    HttpClient,
 };
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\{
     ResponseInterface,
-    StreamInterface
+    StreamInterface,
 };
 use RuntimeException;
 
-class ClientTest extends TestCase
-{
-    public function testCreateV1(): void
-    {
-        $client = Client::createV1(
-            $this->createMock(HttpMethodsClient::class),
-            'foo'
-        );
-
-        $this->assertInstanceOf(Client::class, $client);
-    }
-
-    public function testAnExceptionThrowWhenCreateV1ClientTokenWithoutApiToken(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        Client::createV1(
-            $this->createMock(HttpMethodsClient::class),
-            ''
-        );
-    }
-
-    public function testCreateV2(): void
-    {
-        $client = Client::createV2(
-            $this->createMock(HttpMethodsClient::class),
-            'foo'
-        );
-
-        $this->assertInstanceOf(Client::class, $client);
-    }
-
-    public function testAnExceptionThrowWhenCreateV2ClientTokenWithoutApiToken(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        Client::createV2(
-            $this->createMock(HttpMethodsClient::class),
-            ''
-        );
-    }
-
-    public function testCreateV3(): void
-    {
-        $client = Client::createV3(
-            $this->createMock(HttpMethodsClient::class),
-            'foo'
-        );
-
-        $this->assertInstanceOf(Client::class, $client);
-    }
-
-    public function testAnExceptionThrowWhenCreateV3ClientTokenWithoutApiToken(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        Client::createV1(
-            $this->createMock(HttpMethodsClient::class),
-            ''
-        );
-    }
-
-    public function testCreateBeta(): void
-    {
-        $client = Client::createBeta(
-            $this->createMock(HttpMethodsClient::class),
-            'foo'
-        );
-
-        $this->assertInstanceOf(Client::class, $client);
-    }
-
-    public function testAnExceptionThrowWhenCreateBetaClientTokenWithoutApiToken(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        Client::createBeta(
-            $this->createMock(HttpMethodsClient::class),
-            ''
-        );
-    }
-
-    public function testContruct(): void
-    {
-        $client = new Client(
-            $this->createMock(HttpMethodsClient::class),
-            'http://domain.tld',
-            'foo'
-        );
-
-        $this->assertInstanceOf(Client::class, $client);
-    }
-
-    public function testConstructWithInvalidUrl(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        new Client(
-            $this->createMock(HttpMethodsClient::class),
-            'foo',
-            'bar'
-        );
-    }
-
-    public function testAnExceptionThrowWhenCreateTokenWithoutApiToken(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        new Client(
-            $this->createMock(HttpMethodsClient::class),
-            'http://domain.tld',
-            ''
-        );
-    }
-
-    /**
-     * @dataProvider httpMethods
-     */
-    public function testCallForV1(string $method, int $statusCode, $responseContent, ...$requestParams): void
-    {
-        $response = $this->createResponse($statusCode, $responseContent);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method($method)
-            ->with('https://api.clubhouse.io/api/v1/resource?token=foo')
-            ->willReturn($response);
-
-        $client = Client::createV1($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $requestParams);
-
-        $this->assertTrue(true, 'No error occured during call');
-    }
-
-    /**
-     * @dataProvider httpMethods
-     */
-    public function testCallForV2(string $method, int $statusCode, $responseContent, ...$requestParams): void
-    {
-        $response = $this->createResponse($statusCode, $responseContent);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method($method)
-            ->with('https://api.clubhouse.io/api/v2/resource?token=foo')
-            ->willReturn($response);
-
-        $client = Client::createV2($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $requestParams);
-
-        $this->assertTrue(true, 'No error occured during call');
-    }
-
-    /**
-     * @dataProvider httpMethods
-     */
-    public function testCallForBeta(string $method, int $statusCode, $responseContent, ...$requestParams): void
-    {
-        $response = $this->createResponse($statusCode, $responseContent);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method($method)
-            ->with('https://api.clubhouse.io/api/beta/resource?token=foo')
-            ->willReturn($response);
-
-        $client = Client::createBeta($http, 'foo');
-        $resource = call_user_func([$client, $method], 'resource', $requestParams);
-
-        $this->assertTrue(true, 'No error occured during call');
-    }
-
-    public function testGetCall(): void
-    {
-        $response = $this->createResponse(200, []);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('get')
-            ->with('http://domain.tld/resource/42?token=foo')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-        $resource = $client->get('resource/42');
-
-        $this->assertIsArray($resource);
-    }
-
-    public function testGetCallWithError(): void
-    {
-        $response = $this->createResponse(400, ['message' => 'Bad request']);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('get')
-            ->with('http://domain.tld/resource/42?token=foo')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('Bad request');
-
-        $client->get('resource/42');
-    }
-
-    public function testGetCallWithErrorWithDefaultMessage(): void
-    {
-        $response = $this->createResponse(500, '');
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('get')
-            ->with('http://domain.tld/resource/42?token=foo')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('An error occured.');
-
-        $client->get('resource/42');
-    }
-
-    public function testPostCall(): void
-    {
-        $requestParams = [
-            'foo' => 'bar',
-            'qux' => 'quux',
-        ];
-
-        $response = $this->createResponse(201, []);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('post')
-            ->with(
-                'http://domain.tld/resource?token=foo',
-                ['Content-Type' => 'application/json'],
-                json_encode($requestParams)
-            )
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-        $resource = $client->post('resource', $requestParams);
-
-        $this->assertIsArray($resource);
-    }
-
-    public function testPostCallWithError(): void
-    {
-        $response = $this->createResponse(400, ['message' => 'Bad request']);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('post')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('Bad request');
-
-        $client->post('resource', []);
-    }
-
-    public function testPostCallWithErrorWithDefaultMessage(): void
-    {
-        $response = $this->createResponse(500, '');
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('post')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('An error occured.');
-
-        $client->post('resource', []);
-    }
-
-    public function testPutCall(): void
-    {
-        $requestParams = [
-            'foo' => 'bar',
-            'qux' => 'quux',
-        ];
-
-        $response = $this->createResponse(200, []);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('put')
-            ->with(
-                'http://domain.tld/resource/42?token=foo',
-                ['Content-Type' => 'application/json'],
-                json_encode($requestParams)
-            )
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-        $resource = $client->put('resource/42', $requestParams);
-
-        $this->assertIsArray($resource);
-    }
-
-    public function testPutCallWithError(): void
-    {
-        $response = $this->createResponse(400, ['message' => 'Bad request']);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('put')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('Bad request');
-
-        $client->put('resource/42', []);
-    }
-
-    public function testPutCallWithErrorWithDefaultMessage(): void
-    {
-        $response = $this->createResponse(500, '');
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('put')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('An error occured.');
-
-        $client->put('resource/42', []);
-    }
-
-    public function testDeleteCall(): void
-    {
-        $response = $this->createResponse(204, null);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('delete')
-            ->with('http://domain.tld/resource?token=foo')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-        $this->assertNull($client->delete('resource'));
-    }
-
-    public function testDeleteCallWithError(): void
-    {
-        $response = $this->createResponse(400, ['message' => 'Bad request']);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('delete')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('Bad request');
-
-        $client->delete('resource/42', []);
-    }
-
-    public function testDeleteCallWithErrorWithDefaultMessage(): void
-    {
-        $response = $this->createResponse(500, '');
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method('delete')
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException(ClubhouseException::class);
-        $this->expectException(LegacyClubhouseException::class);
-        $this->expectExceptionMessage('An error occured.');
-
-        $client->delete('resource/42', []);
-    }
-
-    /**
-     * @dataProvider exceptionCalls
-     */
-    public function testCallsThrowAnException(string $method, int $statusCode, string $exceptionClass, ...$params): void
-    {
-        $response = $this->createResponse($statusCode, []);
-
-        $http = $this->createMock(HttpMethodsClient::class);
-        $http->expects($this->once())
-            ->method($method)
-            ->willReturn($response);
-
-        $client = new Client($http, 'http://domain.tld', 'foo');
-
-        $this->expectException($exceptionClass);
-
-        call_user_func([$client, $method], 'resource', $params);
-    }
-
-    public function exceptionCalls(): array
-    {
-        return [
-            ['get', 404, ResourceNotExist::class],
-            ['post', 404, ResourceNotExist::class, []],
-            ['put', 404, ResourceNotExist::class, []],
-            ['delete', 404, ResourceNotExist::class],
-
-            ['get', 400, SchemaMismatch::class],
-            ['post', 400, SchemaMismatch::class, []],
-            ['put', 400, SchemaMismatch::class, []],
-            ['delete', 400, SchemaMismatch::class],
-
-            ['get', 429, TooManyRequest::class],
-            ['post', 429, TooManyRequest::class, []],
-            ['put', 429, TooManyRequest::class, []],
-            ['delete', 429, TooManyRequest::class],
-
-            ['get', 422, Unprocessable::class],
-            ['post', 422, Unprocessable::class, []],
-            ['put', 422, Unprocessable::class, []],
-            ['delete', 422, Unprocessable::class],
-        ];
-    }
-
-    public function httpMethods(): array
-    {
-        return [
-            ['get', 200, []],
-            ['post', 201, [], []],
-            ['put', 200, [], []],
-            ['delete', 204, null],
-        ];
-    }
-
-    private function createResponse(int $statusCode, $content = null): ResponseInterface
-    {
-        $stream = new class($content) implements StreamInterface {
-            private $content;
-
-            public function __construct($content)
-            {
-                $this->content = json_encode($content);
-            }
-
-            public function __toString()
-            {
-                return (string) $this->content;
-            }
-
-            public function close()
-            {
-            }
-
-            public function detach()
-            {
-            }
-
-            public function getSize()
-            {
-            }
-
-            public function tell()
-            {
-            }
-
-            public function eof()
-            {
-            }
-
-            public function isSeekable()
-            {
-            }
-
-            public function seek($offset, $whence = SEEK_SET)
-            {
-            }
-
-            public function rewind()
-            {
-            }
-
-            public function isWritable()
-            {
-            }
-
-            public function write($string)
-            {
-            }
-
-            public function isReadable()
-            {
-            }
-
-            public function read($length)
-            {
-            }
-
-            public function getContents()
-            {
-                return $this->content;
-            }
-
-            public function getMetadata($key = null)
-            {
-            }
-        };
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getBody')
-            ->willReturn($stream);
-
-        return $response;
-    }
-}
+test('create v1 api client', function(): void {
+    $client = Client::createV1(
+        $this->createMock(HttpMethodsClient::class),
+        'foo',
+    );
+
+    $this->assertInstanceOf(HttpClient::class, $client);
+    $this->assertInstanceOf(Client::class, $client);
+});
+
+test('an exception throw  when create v1 api client whithout api token', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    Client::createV1(
+        $this->createMock(HttpMethodsClient::class),
+        '',
+    );
+});
+
+test('create v2 api client', function(): void {
+    $client = Client::createV2(
+        $this->createMock(HttpMethodsClient::class),
+        'foo',
+    );
+
+    $this->assertInstanceOf(HttpClient::class, $client);
+    $this->assertInstanceOf(Client::class, $client);
+});
+
+test('an exception throw  when create v2 api client whithout api token', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    Client::createV2(
+        $this->createMock(HttpMethodsClient::class),
+        '',
+    );
+});
+
+test('create v3 api client', function(): void {
+    $client = Client::createV3(
+        $this->createMock(HttpMethodsClient::class),
+        'foo',
+    );
+
+    $this->assertInstanceOf(HttpClient::class, $client);
+    $this->assertInstanceOf(Client::class, $client);
+});
+
+test('an exception throw  when create v3 api client whithout api token', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    Client::createV1(
+        $this->createMock(HttpMethodsClient::class),
+        '',
+    );
+});
+
+test('create beta api client', function(): void {
+    $client = Client::createBeta(
+        $this->createMock(HttpMethodsClient::class),
+        'foo',
+    );
+
+    $this->assertInstanceOf(HttpClient::class, $client);
+    $this->assertInstanceOf(Client::class, $client);
+});
+
+test('an exception throw  when create beta api client whithout api token', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    Client::createBeta(
+        $this->createMock(HttpMethodsClient::class),
+        '',
+    );
+});
+
+test('create client through constructor', function(): void {
+    $client = new Client(
+        $this->createMock(HttpMethodsClient::class),
+        'http://domain.tld',
+        'foo',
+    );
+
+    $this->assertInstanceOf(HttpClient::class, $client);
+    $this->assertInstanceOf(Client::class, $client);
+});
+
+test('an exception throw when create client with invalid url', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    new Client(
+        $this->createMock(HttpMethodsClient::class),
+        'foo',
+        'bar',
+    );
+});
+
+test('en exception throw when create client without api token', function(): void {
+    $this->expectException(RuntimeException::class);
+
+    new Client(
+        $this->createMock(HttpMethodsClient::class),
+        'http://domain.tld',
+        '',
+    );
+});
+
+test('v1 api client call', function(string $method, int $statusCode, $responseContent, ...$requestParams): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn($statusCode);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode($responseContent));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method($method)
+        ->with('https://api.clubhouse.io/api/v1/resource?token=foo')
+        ->willReturn($response);
+
+    $client = Client::createV1($http, 'foo');
+    $resource = call_user_func([$client, $method], 'resource', $requestParams);
+
+    $this->assertTrue(true, 'No error occured during call');
+})->with('http methods');
+
+test('v2 api client call', function(string $method, int $statusCode, $responseContent, ...$requestParams): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn($statusCode);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode($responseContent));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method($method)
+        ->with('https://api.clubhouse.io/api/v2/resource?token=foo')
+        ->willReturn($response);
+
+    $client = Client::createV2($http, 'foo');
+    $resource = call_user_func([$client, $method], 'resource', $requestParams);
+
+    $this->assertTrue(true, 'No error occured during call');
+})->with('http methods');
+
+test('v3 api client call', function(string $method, int $statusCode, $responseContent, ...$requestParams): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn($statusCode);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode($responseContent));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method($method)
+        ->with('https://api.clubhouse.io/api/v3/resource?token=foo')
+        ->willReturn($response);
+
+    $client = Client::createV3($http, 'foo');
+    $resource = call_user_func([$client, $method], 'resource', $requestParams);
+
+    $this->assertTrue(true, 'No error occured during call');
+})->with('http methods');
+
+test('beta api client call', function(string $method, int $statusCode, $responseContent, ...$requestParams): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn($statusCode);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode($responseContent));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method($method)
+        ->with('https://api.clubhouse.io/api/beta/resource?token=foo')
+        ->willReturn($response);
+
+    $client = Client::createBeta($http, 'foo');
+    $resource = call_user_func([$client, $method], 'resource', $requestParams);
+
+    $this->assertTrue(true, 'No error occured during call');
+})->with('http methods');
+
+test('get call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(200);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode([]));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('get')
+        ->with('http://domain.tld/resource/42?token=foo')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+    $resource = $client->get('resource/42');
+
+    $this->assertIsArray($resource);
+});
+
+test('an exception throw on error in get call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(400);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(['message' => 'Bad request']));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('get')
+        ->with('http://domain.tld/resource/42?token=foo')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('Bad request');
+
+    $client->get('resource/42');
+});
+
+test('an exception throw with default message on error in get call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(500);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(null));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('get')
+        ->with('http://domain.tld/resource/42?token=foo')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('An error occured.');
+
+    $client->get('resource/42');
+});
+
+test('api post call', function(): void {
+    $requestParams = [
+        'foo' => 'bar',
+        'qux' => 'quux',
+    ];
+
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(201);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode([]));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('post')
+        ->with(
+            'http://domain.tld/resource?token=foo',
+            ['Content-Type' => 'application/json'],
+            json_encode($requestParams),
+        )
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+    $resource = $client->post('resource', $requestParams);
+
+    $this->assertIsArray($resource);
+});
+
+test('an exception throw on error in api post call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(400);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(['message' => 'Bad request']));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('post')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('Bad request');
+
+    $client->post('resource', []);
+});
+
+test('an exception throw with default message on error in api post call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(500);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(''));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('post')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('An error occured.');
+
+    $client->post('resource', []);
+});
+
+test('api put call', function(): void {
+    $requestParams = [
+        'foo' => 'bar',
+        'qux' => 'quux',
+    ];
+
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(200);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode([]));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('put')
+        ->with(
+            'http://domain.tld/resource?token=foo',
+            ['Content-Type' => 'application/json'],
+            json_encode($requestParams),
+        )
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+    $resource = $client->put('resource', $requestParams);
+
+    $this->assertIsArray($resource);
+});
+
+test('an exception throw on error in api put call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(400);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(['message' => 'Bad request']));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('put')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('Bad request');
+
+    $client->put('resource', []);
+});
+
+test('an exception throw with default message on error in api put call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(500);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(''));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('put')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('An error occured.');
+
+    $client->put('resource', []);
+});
+
+test('api delete call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(204);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(null));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('delete')
+        ->with('http://domain.tld/resource?token=foo')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+    $client->delete('resource');
+});
+
+test('an exception throw on error in api delete call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(400);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(['message' => 'Bad request']));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('delete')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('Bad request');
+
+    $client->delete('resource');
+});
+
+test('an exception throw with default message on error in api delete call', function(): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn(500);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(''));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method('delete')
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException(ClubhouseException::class);
+    $this->expectException(LegacyClubhouseException::class);
+    $this->expectExceptionMessage('An error occured.');
+
+    $client->delete('resource');
+});
+
+test('an exception throw on api error', function(string $method, int $statusCode, string $exceptionClass, ...$params): void {
+    $response = $this->createMock(ResponseInterface::class);
+    $response->method('getStatusCode')
+        ->willReturn($statusCode);
+    $response->method('getBody')
+        ->willReturn($stream = $this->createMock(StreamInterface::class));
+
+    $stream->method('getContents')
+        ->willReturn(json_encode(null));
+
+    $http = $this->createMock(HttpMethodsClient::class);
+    $http->expects($this->once())
+        ->method($method)
+        ->willReturn($response);
+
+    $client = new Client($http, 'http://domain.tld', 'foo');
+
+    $this->expectException($exceptionClass);
+
+    call_user_func([$client, $method], 'resource', $params);
+})->with([
+    ['get', 404, ResourceNotExist::class],
+    ['post', 404, ResourceNotExist::class, []],
+    ['put', 404, ResourceNotExist::class, []],
+    ['delete', 404, ResourceNotExist::class],
+
+    ['get', 400, SchemaMismatch::class],
+    ['post', 400, SchemaMismatch::class, []],
+    ['put', 400, SchemaMismatch::class, []],
+    ['delete', 400, SchemaMismatch::class],
+
+    ['get', 429, TooManyRequest::class],
+    ['post', 429, TooManyRequest::class, []],
+    ['put', 429, TooManyRequest::class, []],
+    ['delete', 429, TooManyRequest::class],
+
+    ['get', 422, Unprocessable::class],
+    ['post', 422, Unprocessable::class, []],
+    ['put', 422, Unprocessable::class, []],
+    ['delete', 422, Unprocessable::class],
+]);
+
+dataset('http methods', [
+    ['get', 200, []],
+    ['post', 201, [], []],
+    ['put', 200, [], []],
+    ['delete', 204, null],
+]);
