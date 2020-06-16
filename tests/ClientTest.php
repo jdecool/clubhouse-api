@@ -7,7 +7,6 @@ namespace JDecool\Clubhouse\Tests;
 use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Client,
-    ClubhouseException as LegacyClubhouseException,
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
     Exception\SchemaMismatch,
@@ -257,7 +256,6 @@ test('an exception throw on error in get call', function(): void {
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('Bad request');
 
     $client->get('resource/42');
@@ -282,7 +280,6 @@ test('an exception throw with default message on error in get call', function():
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('An error occured.');
 
     $client->get('resource/42');
@@ -337,7 +334,6 @@ test('an exception throw on error in api post call', function(): void {
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('Bad request');
 
     $client->post('resource', []);
@@ -361,7 +357,6 @@ test('an exception throw with default message on error in api post call', functi
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('An error occured.');
 
     $client->post('resource', []);
@@ -416,7 +411,6 @@ test('an exception throw on error in api put call', function(): void {
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('Bad request');
 
     $client->put('resource', []);
@@ -440,7 +434,6 @@ test('an exception throw with default message on error in api put call', functio
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('An error occured.');
 
     $client->put('resource', []);
@@ -484,7 +477,6 @@ test('an exception throw on error in api delete call', function(): void {
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('Bad request');
 
     $client->delete('resource');
@@ -508,7 +500,6 @@ test('an exception throw with default message on error in api delete call', func
     $client = new Client($http, 'http://domain.tld', 'foo');
 
     $this->expectException(ClubhouseException::class);
-    $this->expectException(LegacyClubhouseException::class);
     $this->expectExceptionMessage('An error occured.');
 
     $client->delete('resource');
