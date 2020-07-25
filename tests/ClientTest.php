@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JDecool\Clubhouse\Tests;
 
-use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Client,
     Exception\ClubhouseException,
@@ -14,6 +13,7 @@ use JDecool\Clubhouse\{
     Exception\Unprocessable,
     HttpClient,
 };
+use Http\Client\Common\HttpMethodsClientInterface;
 use Psr\Http\Message\{
     ResponseInterface,
     StreamInterface,
@@ -22,7 +22,7 @@ use RuntimeException;
 
 test('create v1 api client', function(): void {
     $client = Client::createV1(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'foo',
     );
 
@@ -34,14 +34,14 @@ test('an exception throw  when create v1 api client whithout api token', functio
     $this->expectException(RuntimeException::class);
 
     Client::createV1(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         '',
     );
 });
 
 test('create v2 api client', function(): void {
     $client = Client::createV2(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'foo',
     );
 
@@ -53,14 +53,14 @@ test('an exception throw  when create v2 api client whithout api token', functio
     $this->expectException(RuntimeException::class);
 
     Client::createV2(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         '',
     );
 });
 
 test('create v3 api client', function(): void {
     $client = Client::createV3(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'foo',
     );
 
@@ -72,14 +72,14 @@ test('an exception throw  when create v3 api client whithout api token', functio
     $this->expectException(RuntimeException::class);
 
     Client::createV1(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         '',
     );
 });
 
 test('create beta api client', function(): void {
     $client = Client::createBeta(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'foo',
     );
 
@@ -91,14 +91,14 @@ test('an exception throw  when create beta api client whithout api token', funct
     $this->expectException(RuntimeException::class);
 
     Client::createBeta(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         '',
     );
 });
 
 test('create client through constructor', function(): void {
     $client = new Client(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'http://domain.tld',
         'foo',
     );
@@ -111,7 +111,7 @@ test('an exception throw when create client with invalid url', function(): void 
     $this->expectException(RuntimeException::class);
 
     new Client(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'foo',
         'bar',
     );
@@ -121,7 +121,7 @@ test('en exception throw when create client without api token', function(): void
     $this->expectException(RuntimeException::class);
 
     new Client(
-        $this->createMock(HttpMethodsClient::class),
+        $this->createMock(HttpMethodsClientInterface::class),
         'http://domain.tld',
         '',
     );
@@ -137,7 +137,7 @@ test('v1 api client call', function(string $method, int $statusCode, $responseCo
     $stream->method('getContents')
         ->willReturn(json_encode($responseContent));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method($method)
         ->with('https://api.clubhouse.io/api/v1/resource?token=foo')
@@ -159,7 +159,7 @@ test('v2 api client call', function(string $method, int $statusCode, $responseCo
     $stream->method('getContents')
         ->willReturn(json_encode($responseContent));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method($method)
         ->with('https://api.clubhouse.io/api/v2/resource?token=foo')
@@ -181,7 +181,7 @@ test('v3 api client call', function(string $method, int $statusCode, $responseCo
     $stream->method('getContents')
         ->willReturn(json_encode($responseContent));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method($method)
         ->with('https://api.clubhouse.io/api/v3/resource?token=foo')
@@ -203,7 +203,7 @@ test('beta api client call', function(string $method, int $statusCode, $response
     $stream->method('getContents')
         ->willReturn(json_encode($responseContent));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method($method)
         ->with('https://api.clubhouse.io/api/beta/resource?token=foo')
@@ -225,7 +225,7 @@ test('get call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode([]));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('get')
         ->with('http://domain.tld/resource/42?token=foo')
@@ -247,7 +247,7 @@ test('an exception throw on error in get call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode(['message' => 'Bad request']));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('get')
         ->with('http://domain.tld/resource/42?token=foo')
@@ -271,7 +271,7 @@ test('an exception throw with default message on error in get call', function():
     $stream->method('getContents')
         ->willReturn(json_encode(null));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('get')
         ->with('http://domain.tld/resource/42?token=foo')
@@ -300,7 +300,7 @@ test('api post call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode([]));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('post')
         ->with(
@@ -326,7 +326,7 @@ test('an exception throw on error in api post call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode(['message' => 'Bad request']));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('post')
         ->willReturn($response);
@@ -349,7 +349,7 @@ test('an exception throw with default message on error in api post call', functi
     $stream->method('getContents')
         ->willReturn(json_encode(''));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('post')
         ->willReturn($response);
@@ -377,7 +377,7 @@ test('api put call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode([]));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('put')
         ->with(
@@ -403,7 +403,7 @@ test('an exception throw on error in api put call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode(['message' => 'Bad request']));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('put')
         ->willReturn($response);
@@ -426,7 +426,7 @@ test('an exception throw with default message on error in api put call', functio
     $stream->method('getContents')
         ->willReturn(json_encode(''));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('put')
         ->willReturn($response);
@@ -449,7 +449,7 @@ test('api delete call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode(null));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('delete')
         ->with('http://domain.tld/resource?token=foo')
@@ -469,7 +469,7 @@ test('an exception throw on error in api delete call', function(): void {
     $stream->method('getContents')
         ->willReturn(json_encode(['message' => 'Bad request']));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('delete')
         ->willReturn($response);
@@ -492,7 +492,7 @@ test('an exception throw with default message on error in api delete call', func
     $stream->method('getContents')
         ->willReturn(json_encode(''));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method('delete')
         ->willReturn($response);
@@ -515,7 +515,7 @@ test('an exception throw on api error', function(string $method, int $statusCode
     $stream->method('getContents')
         ->willReturn(json_encode(null));
 
-    $http = $this->createMock(HttpMethodsClient::class);
+    $http = $this->createMock(HttpMethodsClientInterface::class);
     $http->expects($this->once())
         ->method($method)
         ->willReturn($response);

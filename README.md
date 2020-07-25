@@ -1,22 +1,21 @@
 Clubhouse API client
 ====================
 
-[![Build Status](https://travis-ci.org/jdecool/clubhouse-api.svg?branch=master)](https://travis-ci.org/jdecool/clubhouse-api?branch=master)
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fjdecool%2Fclubhouse-api%2Fbadge%3Fref%3Dmaster&style=flat)](https://actions-badge.atrox.dev/jdecool/clubhouse-api/goto?ref=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jdecool/clubhouse-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jdecool/clubhouse-api/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/jdecool/clubhouse-api/v/stable.png)](https://packagist.org/packages/jdecool/clubhouse-api)
 
-A simple PHP client for [Clubhouse.io REST API](https://clubhouse.io/api/rest/v2/).
+A simple PHP client for [Clubhouse.io REST API](https://clubhouse.io/api/rest/v3/).
 
 ## Install it
+
+The library is decoupled from any HTTP message client with [HTTPlug](http://httplug.io). That's why you need to install a client implementation `http://httplug.io/` in this example.
 
 Install using [composer](https://getcomposer.org):
 
 ```bash
-composer require jdecool/clubhouse-api "php-http/guzzle6-adapter:^1.0"
+composer require jdecool/clubhouse-api php-http/guzzle6-adapter http-interop/http-factory-guzzle
 ```
-
-The library is decoupled from any HTTP message client with [HTTPlug](http://httplug.io). That's why you need to install a client implementation `http://httplug.io/` in this example.
 
 ## Getting started
 

@@ -8,8 +8,8 @@ use Http\{
     Client\Common\HttpMethodsClient,
     Client\HttpClient,
     Discovery\HttpClientDiscovery,
-    Discovery\MessageFactoryDiscovery,
-    Message\MessageFactory
+    Discovery\Psr17FactoryDiscovery,
+    Message\RequestFactory,
 };
 use RuntimeException;
 
@@ -21,12 +21,12 @@ class ClientBuilder
     public const BETA = 'beta';
 
     private $httpClient;
-    private $messageFactory;
+    private $requestFactory;
 
-    public function __construct(?HttpClient $httpClient = null, ?MessageFactory $messageFactory = null)
+    public function __construct(?HttpClient $httpClient = null, ?RequestFactory $requestFactory = null)
     {
         $this->httpClient = $httpClient ?? HttpClientDiscovery::find();
-        $this->messageFactory = $messageFactory ?? MessageFactoryDiscovery::find();
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
     }
 
     public function createClientV1(string $token): Client
@@ -51,7 +51,7 @@ class ClientBuilder
 
     public function create(string $version, string $token): Client
     {
-        $http = new HttpMethodsClient($this->httpClient, $this->messageFactory);
+        $http = new HttpMethodsClient($this->httpClient, $this->requestFactory);
 
         switch ($version) {
             case self::V1:
