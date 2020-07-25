@@ -12,16 +12,17 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
-        "php-http/client-common": "^1.7",
+        "php-http/client-common": "^2.3",
         "php-http/client-implementation": "^1.0",
-        "php-http/discovery": "^1.4",
-        "php-http/httplug": "^1.1"
+        "php-http/discovery": "^1.6",
+        "php-http/httplug": "^2.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
+        "http-interop/http-factory-guzzle": "^1.0",
         "nunomaduro/collision": "^5.0@dev",
         "pestphp/pest": "^0.1.5",
-        "php-http/guzzle6-adapter": "^1.0",
+        "php-http/guzzle6-adapter": "^2.0",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^9.0"
     },
