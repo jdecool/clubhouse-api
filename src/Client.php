@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JDecool\Clubhouse;
 
-use Http\Client\Common\HttpMethodsClient;
 use JDecool\Clubhouse\{
     Exception\ClubhouseException,
     Exception\ResourceNotExist,
@@ -12,6 +11,7 @@ use JDecool\Clubhouse\{
     Exception\TooManyRequest,
     Exception\Unprocessable,
 };
+use Http\Client\Common\HttpMethodsClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -26,27 +26,27 @@ class Client implements HttpClient
     private $baseUri;
     private $token;
 
-    public static function createV1(HttpMethodsClient $http, string $token): self
+    public static function createV1(HttpMethodsClientInterface $http, string $token): self
     {
         return new self($http, self::ENDPOINT_V1, $token);
     }
 
-    public static function createV2(HttpMethodsClient $http, string $token): self
+    public static function createV2(HttpMethodsClientInterface $http, string $token): self
     {
         return new self($http, self::ENDPOINT_V2, $token);
     }
 
-    public static function createV3(HttpMethodsClient $http, string $token): self
+    public static function createV3(HttpMethodsClientInterface $http, string $token): self
     {
         return new self($http, self::ENDPOINT_V3, $token);
     }
 
-    public static function createBeta(HttpMethodsClient $http, string $token): self
+    public static function createBeta(HttpMethodsClientInterface $http, string $token): self
     {
         return new self($http, self::ENDPOINT_BETA, $token);
     }
 
-    public function __construct(HttpMethodsClient $http, string $baseUri, string $token)
+    public function __construct(HttpMethodsClientInterface $http, string $baseUri, string $token)
     {
         if (false === filter_var($baseUri, FILTER_VALIDATE_URL)) {
             throw new RuntimeException('Invalid Clubouse base URI.');
