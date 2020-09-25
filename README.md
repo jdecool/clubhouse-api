@@ -14,7 +14,7 @@ The library is decoupled from any HTTP message client with [HTTPlug](http://http
 Install using [composer](https://getcomposer.org):
 
 ```bash
-composer require jdecool/clubhouse-api php-http/guzzle6-adapter http-interop/http-factory-guzzle
+composer require jdecool/clubhouse-api php-http/guzzle7-adapter http-interop/http-factory-guzzle
 ```
 
 ## Getting started
