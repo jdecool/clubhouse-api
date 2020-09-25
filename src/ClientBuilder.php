@@ -7,8 +7,8 @@ namespace JDecool\Clubhouse;
 use Http\{
     Client\Common\HttpMethodsClient,
     Client\HttpClient,
-    Discovery\HttpClientDiscovery,
     Discovery\Psr17FactoryDiscovery,
+    Discovery\Psr18ClientDiscovery,
     Message\RequestFactory,
 };
 use RuntimeException;
@@ -25,7 +25,7 @@ class ClientBuilder
 
     public function __construct(?HttpClient $httpClient = null, ?RequestFactory $requestFactory = null)
     {
-        $this->httpClient = $httpClient ?? HttpClientDiscovery::find();
+        $this->httpClient = $httpClient ?? Psr18ClientDiscovery::find();
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
     }
 
