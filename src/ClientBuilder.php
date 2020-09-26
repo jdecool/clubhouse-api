@@ -17,16 +17,11 @@ use Http\{
     Message\Authentication\QueryParam,
     Message\RequestFactory,
 };
+use JDecool\Clubhouse\Exception\ClubhouseException;
 use Psr\Http\Message\UriFactoryInterface;
-use RuntimeException;
 
 class ClientBuilder
 {
-    public const V1 = 'v1';
-    public const V2 = 'v2';
-    public const V3 = 'v3';
-    public const BETA = 'beta';
-
     private const ENDPOINT_V1 = 'https://api.clubhouse.io/api/v1';
     private const ENDPOINT_V2 = 'https://api.clubhouse.io/api/v2';
     private const ENDPOINT_V3 = 'https://api.clubhouse.io/api/v3';
@@ -48,45 +43,32 @@ class ClientBuilder
 
     public function createClientV1(string $token): Client
     {
-        return $this->create(self::V1, $token);
+        return $this->create(self::ENDPOINT_V1, $token);
     }
 
     public function createClientV2(string $token): Client
     {
-        return $this->create(self::V2, $token);
+        return $this->create(self::ENDPOINT_V2, $token);
     }
 
     public function createClientV3(string $token): Client
     {
-        return $this->create(self::V3, $token);
+        return $this->create(self::ENDPOINT_V3, $token);
     }
 
     public function createClientBeta(string $token): Client
     {
-        return $this->create(self::BETA, $token);
+        return $this->create(self::ENDPOINT_BETA, $token);
     }
 
-    public function create(string $version, string $token): Client
+    public function create(string $url, string $token): Client
     {
-        switch ($version) {
-            case self::V1:
-                $url = self::ENDPOINT_V1;
-                break;
+        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new ClubhouseException('Invalid Clubouse base URI.');
+        }
 
-            case self::V2:
-                $url = self::ENDPOINT_V2;
-                break;
-
-            case self::V3:
-                $url = self::ENDPOINT_V3;
-                break;
-
-            case self::BETA:
-                $url = self::ENDPOINT_BETA;
-                break;
-
-            default:
-                throw new RuntimeException("Version '$version' is not supported.");
+        if ('' === trim($token)) {
+            throw new ClubhouseException('API token is required.');
         }
 
         $plugins = [
