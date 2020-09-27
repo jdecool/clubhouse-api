@@ -70,17 +70,12 @@ test('an exception throw when create beta api client without token', function():
     $builder->createClientBeta('');
 });
 
-test('create client', function($version): void {
+test('create client', function(): void {
     $builder = new ClientBuilder();
-    $client = $builder->create($version, 'foo');
+    $client = $builder->create('https://domain.tld/api', 'foo');
 
     $this->assertInstanceOf(Client::class, $client);
-})->with([
-    ClientBuilder::V1,
-    ClientBuilder::V2,
-    ClientBuilder::V3,
-    ClientBuilder::BETA,
-]);
+});
 
 test('an exception throw if trying to create a client with invalid version', function(): void {
     $builder = new ClientBuilder();
@@ -95,5 +90,5 @@ test('an exception thow when create client without api token', function(): void 
 
     $this->expectException(RuntimeException::class);
 
-    $builder->create(ClientBuilder::V3, '');
+    $builder->create('http://domain.tld/api', '');
 });
