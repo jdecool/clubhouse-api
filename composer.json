@@ -21,7 +21,7 @@
         "guzzlehttp/guzzle": "^7.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "nunomaduro/collision": "^5.0",
-        "pestphp/pest": "^0.3.0",
+        "pestphp/pest": "^1.20",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^9.0"
     },
