@@ -34,11 +34,13 @@ class ClientBuilder
     public function __construct(
         ?HttpClient $httpClient = null,
         ?RequestFactory $requestFactory = null,
-        ?UriFactoryInterface $uriFactory = null
+        ?UriFactoryInterface $uriFactory = null,
+        ?StreamFactoryInterface $streamFactory = null
     ) {
         $this->httpClient = $httpClient ?? Psr18ClientDiscovery::find();
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
         $this->uriFactory = $uriFactory ?? Psr17FactoryDiscovery::findUriFactory();
+        $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
     }
 
     public function createClientV1(string $token): Client
@@ -89,7 +91,8 @@ class ClientBuilder
 
         $http = new HttpMethodsClient(
             new PluginClient($this->httpClient, $plugins),
-            $this->requestFactory
+            $this->requestFactory,
+            $this->streamFactory
         );
 
         return new Client($http);
